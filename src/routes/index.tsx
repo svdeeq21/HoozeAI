@@ -756,7 +756,7 @@ function Audit() {
               <a href={WA_LINK} target="_blank" rel="noopener noreferrer" className="btn-amber">
                 <MessageSquare className="h-4 w-4" /> Get my free lead audit
               </a>
-              <a href="mailto:hello@hooze.ai" className="btn-ghost">
+              <a href="mailto:hoozeenterprises@gmail.com" className="btn-ghost">
                 Email us instead
               </a>
             </div>
