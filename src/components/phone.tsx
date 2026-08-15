@@ -302,7 +302,7 @@ export function ListingCard({ p }: { p: DemoProperty }) {
             {p.terms}
           </p>
           <p className="mt-1.5 text-[10px] uppercase tracking-wider" style={{ color: WA.sub }}>
-            Demo data
+            Demo listing
           </p>
         </div>
       </div>

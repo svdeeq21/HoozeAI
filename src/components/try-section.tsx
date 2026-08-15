@@ -3,25 +3,38 @@ import { TryHooze } from "./try-hooze";
 
 export function TryDemoSection() {
   return (
-    <section id="try" className="border-t border-line py-24">
+    <section id="try" className="relative border-t border-line bg-bg-2 py-24">
       <div className="container-wrap">
-        <div className="grid items-start gap-14 lg:grid-cols-[1fr_auto]">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-xs uppercase tracking-[0.2em] text-muted">
+            Everything above this explains Hooze.
+          </p>
+          <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
+            This is where you actually{" "}
+            <span className="text-amber italic font-serif">meet it.</span>
+          </h2>
+        </div>
+
+        <div className="mt-16 grid items-start gap-14 lg:grid-cols-[1fr_auto]">
           <div className="max-w-xl">
-            <p className="eyebrow">Try it yourself</p>
+            <p className="eyebrow">Don't take our word for it.</p>
             <h2 className="mt-3 text-3xl font-bold leading-[1.1] tracking-tight sm:text-4xl">
-              Talk to it the way your customer would.
+              Try Hooze yourself.
             </h2>
             <p className="mt-4 leading-relaxed text-muted">
-              This is the same consultant, running on three sample listings in Abuja.
-              Type anything — haggle, change your mind, say it&rsquo;s too expensive,
-              ask it to compare two houses, or tell it you need to discuss with your
-              wife. It should hold the conversation the way a good agent would.
+              Have a real conversation with it. Ask for a house. Ask about land.
+              Tell it your budget, then change your mind. Challenge its
+              recommendation. Ask it to compare two options. Type anything —
+              haggle, say it&rsquo;s too expensive, say you need to discuss with
+              your wife. It should hold the conversation the way a good
+              consultant would.
             </p>
 
             <ul className="mt-8 space-y-3 border-l border-line pl-5 text-sm text-muted">
               {[
-                "Understands buy vs rent, area, budget, occupants, timeline",
-                "Recommends from inventory instead of guessing",
+                "Handles houses, land, commercial space, and development projects — not just houses",
+                "Consults first: purpose, location, budget, timeline — before ever showing a listing",
+                "Recommends from inventory instead of guessing, and never invents a property",
                 "Compares two properties and explains the trade-off",
                 "Pushes back respectfully when your pick isn't the best fit",
                 "Handles price objections and moves you to an inspection",
@@ -34,13 +47,14 @@ export function TryDemoSection() {
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber" />
               <div className="text-xs leading-relaxed text-muted">
                 <p className="font-semibold uppercase tracking-widest text-ink">
-                  Demo data
+                  Demo listing — not real inventory
                 </p>
                 <p className="mt-1.5">
-                  The properties, prices and images in this demo are illustrative samples
-                  for demonstration only. They are not verified listings, they are not for
-                  sale or rent, and details may be inaccurate or outdated. The demo shows
-                  how the assistant behaves — not our inventory.
+                  The three properties, prices and images in this demo are illustrative
+                  samples for demonstration only. They are not verified listings, they
+                  are not for sale or rent, and details may be inaccurate or outdated.
+                  A production Hooze deployment runs on your actual verified listings,
+                  pricing and availability.
                 </p>
               </div>
             </div>

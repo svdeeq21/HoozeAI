@@ -226,8 +226,8 @@ function Hero() {
               <a href="#audit" className="btn-amber">
                 Get my free WhatsApp lead audit <ArrowRight className="h-4 w-4" />
               </a>
-              <a href="#how" className="btn-ghost">
-                See how it works
+              <a href="#try" className="btn-ghost">
+                Try Hooze live <ArrowRight className="h-4 w-4" />
               </a>
             </div>
           </Reveal>
