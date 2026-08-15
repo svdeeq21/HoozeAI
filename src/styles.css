@@ -1,0 +1,139 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-amber: var(--amber);
+  --color-amber-dk: var(--amber-dk);
+  --color-green: var(--green);
+  --color-red: var(--red);
+
+  --color-background: var(--bg);
+  --color-foreground: var(--ink);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
+  --color-primary: var(--amber);
+  --color-primary-foreground: #0E0E0F;
+  --color-secondary: var(--surface-2);
+  --color-secondary-foreground: var(--ink);
+  --color-muted-foreground: var(--muted);
+  --color-accent: var(--amber);
+  --color-accent-foreground: #0E0E0F;
+  --color-border: var(--line);
+  --color-input: var(--line);
+  --color-ring: var(--amber);
+  --color-destructive: var(--red);
+  --color-destructive-foreground: var(--ink);
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+}
+
+:root {
+  /* Hooze AI — brand tokens (from Documentation/01-Brand/color_system.md
+     + marketing.css). Near-black surface, single amber accent, warm ink. */
+  --bg: oklch(0.16 0.005 60);        /* #0E0E0F */
+  --bg-2: oklch(0.19 0.006 60);      /* #141416 */
+  --surface: oklch(0.22 0.008 60);   /* #1A1A1D */
+  --surface-2: oklch(0.25 0.009 60); /* #202025 */
+  --ink: oklch(0.94 0.008 80);       /* #F0EDE8 warm white */
+  --muted: oklch(0.62 0.008 70);     /* #8A8580 */
+  --line: oklch(0.3 0.006 60);       /* #2A2A2F */
+  --amber: oklch(0.78 0.16 70);      /* #F5A623 */
+  --amber-dk: oklch(0.62 0.14 65);   /* #C87D0E */
+  --green: oklch(0.66 0.13 155);
+  --red: oklch(0.63 0.19 25);
+}
+
+@layer base {
+  * { border-color: var(--color-line); }
+  html { color-scheme: dark; }
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection { background: var(--amber); color: #0E0E0F; }
+}
+
+@utility container-wrap {
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+@utility eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+
+@utility btn-amber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--amber);
+  color: #0E0E0F;
+  font-weight: 600;
+  padding: 0.85rem 1.4rem;
+  border-radius: 10px;
+  transition: transform .15s ease, background .15s ease;
+  &:hover { background: var(--amber-dk); transform: translateY(-1px); }
+}
+
+@utility btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-weight: 500;
+  padding: 0.85rem 1.4rem;
+  border-radius: 10px;
+  transition: border-color .15s ease, background .15s ease;
+  &:hover { border-color: var(--amber); background: color-mix(in oklab, var(--amber) 8%, transparent); }
+}
+
+@utility hz-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1.5rem;
+  transition: border-color .2s ease, transform .2s ease;
+  &:hover { border-color: color-mix(in oklab, var(--amber) 50%, var(--line)); }
+}
+
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease; }
+.reveal.in { opacity: 1; transform: none; }
+
+@keyframes hz-blink {
+  0%, 60%, 100% { opacity: .25; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-2px); }
+}
+
+@keyframes hz-fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
