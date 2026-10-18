@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { RotateCcw } from "lucide-react";
 import {
   PhoneFrame,
   StatusBar,
@@ -12,151 +13,160 @@ import {
   WA,
 } from "./phone";
 import { PROPERTY_BY_ID } from "../lib/demo-properties";
+import { SCENARIO_BY_ID, type InfoCard } from "../lib/demo-scenarios";
 import mark from "../assets/hooze-icon.png";
 
-type Step = {
-  from: "them" | "me";
-  text: string;
-  time: string;
-  delay?: number;
-  card?: string;
-};
+function InfoBubble({ c }: { c: InfoCard }) {
+  return (
+    <div className="flex justify-start">
+      <div
+        className="w-[88%] p-2 text-[12px]"
+        style={{
+          background: WA.incoming,
+          color: WA.text,
+          borderRadius: 8,
+          borderTopLeftRadius: 0,
+          animation: "hz-fade .3s ease-out",
+        }}
+      >
+        <p className="text-[13px] font-semibold">{c.title}</p>
+        <dl className="mt-1.5 divide-y" style={{ borderColor: WA.bar }}>
+          {c.rows.map(([k, v]) => (
+            <div
+              key={k}
+              className="flex justify-between gap-3 py-1"
+              style={{ borderColor: WA.bar }}
+            >
+              <dt style={{ color: WA.sub }}>{k}</dt>
+              <dd className="text-right font-medium">{v}</dd>
+            </div>
+          ))}
+        </dl>
+        {c.foot && (
+          <p
+            className="mt-1.5 text-[10px] uppercase tracking-wider"
+            style={{ color: WA.sub }}
+          >
+            {c.foot}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
 
-const SCRIPT: Step[] = [
-  {
-    from: "them",
-    text: "Hi, is the 4 bedroom duplex in Lokogoma still available?",
-    time: "4:41 PM",
-  },
-  {
-    from: "me",
-    text: "Hi! Yes, that one is still listed as available — 4-bedroom detached duplex with a BQ, in the gated estate off Lokogoma.\n\nAre you looking at it for yourself, as an investment, or are you still comparing a few options?",
-    time: "4:41 PM",
-    card: "lokogoma-duplex",
-  },
-  { from: "them", text: "For myself. But ₦95m is above what I planned.", time: "4:42 PM" },
-  {
-    from: "me",
-    text: "That's fair — most people start there. What number were you working with, roughly? I'd rather show you something you can actually close on than push this one.",
-    time: "4:42 PM",
-  },
-  { from: "them", text: "I'd rather rent for now. 3 bedrooms, around Wuse.", time: "4:44 PM" },
-  {
-    from: "me",
-    text: "Got it. Who's moving in with you, and what's your yearly rent range?",
-    time: "4:44 PM",
-  },
-  { from: "them", text: "Wife and one child. Up to ₦7m if it's serviced.", time: "4:45 PM" },
-  {
-    from: "me",
-    text: "Then two make sense. Wuse 2 serviced 3-bed at ₦6.5m plus ₦900k service charge, and a bigger Gwarinpa terrace at ₦4.8m with no service charge.",
-    time: "4:46 PM",
-    card: "wuse-apartment",
-  },
-  { from: "me", text: "", time: "4:46 PM", card: "gwarinpa-terrace", delay: 700 },
-  { from: "them", text: "Gwarinpa is cheaper and bigger. Why not that one?", time: "4:47 PM" },
-  {
-    from: "me",
-    text: "It is bigger, and if space is your priority I'd say take it. But you told me your office is in the business district.\n\nGwarinpa is 35–45 mins each way in traffic. Wuse 2 is a walk. Over a year that's about 300 hours of your life — and the ₦1.7m gap is mostly that commute.",
-    time: "4:48 PM",
-  },
-  { from: "them", text: "Hmm. True. Can I see the Wuse one?", time: "4:49 PM" },
-  {
-    from: "me",
-    text: "Yes. Saturday 11:00 AM or Sunday 2:00 PM — which works? I'll put the Gwarinpa one on the same run so you can judge both yourself.",
-    time: "4:49 PM",
-  },
-  { from: "them", text: "Saturday 11.", time: "4:50 PM" },
-  {
-    from: "me",
-    text: "Locked in. Saturday, 11:00 AM, Wuse 2 then Gwarinpa. Tunde will call you Friday evening to confirm, and I've sent both floor plans to this chat.",
-    time: "4:50 PM",
-  },
-];
-
-export function ScriptedDemo() {
+function usePlayer(scenarioId: string) {
+  const scenario = SCENARIO_BY_ID[scenarioId] ?? SCENARIO_BY_ID["realestate"]!;
+  const steps = scenario.steps;
   const ref = useRef<HTMLDivElement | null>(null);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
   const [live, setLive] = useState(false);
   const [n, setN] = useState(0);
   const [typing, setTyping] = useState(false);
+  const reduced = useRef(false);
 
   useEffect(() => {
+    reduced.current = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (reduced.current) {
+      setN(steps.length);
+      return;
+    }
     const el = ref.current;
     if (!el) return;
     const obs = new IntersectionObserver(
-      ([e]) => e.isIntersecting && setLive(true),
+      ([e]) => e?.isIntersecting && setLive(true),
       { threshold: 0.3 },
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, []);
+  }, [steps.length]);
 
   useEffect(() => {
-    if (!live || n >= SCRIPT.length) return;
-    const step = SCRIPT[n];
-    const isAi = step.from === "me";
-    const readPause = n === 0 ? 600 : isAi ? 900 : 1400;
-    const typeFor = isAi
+    if (!live || n >= steps.length) return;
+    const step = steps[n]!;
+    const ai = step.from === "me";
+    const read = n === 0 ? 600 : ai ? 900 : 1400;
+    const type = ai
       ? Math.min(2600, 700 + step.text.length * 14)
       : Math.min(1600, 500 + step.text.length * 22);
-
-    const t1 = setTimeout(() => setTyping(true), (step.delay ?? 0) + readPause);
+    const t1 = setTimeout(() => setTyping(true), (step.delay ?? 0) + read);
     const t2 = setTimeout(
       () => {
         setTyping(false);
         setN((v) => v + 1);
       },
-      (step.delay ?? 0) + readPause + typeFor,
+      (step.delay ?? 0) + read + type,
     );
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
     };
-  }, [live, n]);
+  }, [live, n, steps]);
 
+  const record = useMemo(() => {
+    const r: Record<string, string> = {};
+    steps.slice(0, n).forEach((s) => s.set && Object.assign(r, s.set));
+    return r;
+  }, [steps, n]);
+
+  return {
+    scenario,
+    ref,
+    n,
+    typing,
+    record,
+    done: n >= steps.length,
+    replay: () => {
+      setN(0);
+      setTyping(false);
+      setLive(true);
+    },
+  };
+}
+
+type Player = ReturnType<typeof usePlayer>;
+
+function Phone({ p }: { p: Player }) {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const { scenario, n, typing } = p;
   useEffect(() => {
-    const el = scrollRef.current;
-    if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    scrollRef.current?.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: "smooth",
+    });
   }, [n, typing]);
-
-  const done = n >= SCRIPT.length;
-
+  const next = scenario.steps[n];
   return (
-    <PhoneFrame ref={ref} tilt>
-      <StatusBar time="4:50" />
+    <PhoneFrame ref={p.ref}>
+      <StatusBar
+        time={scenario.steps[0]?.time.replace(/\s?[AP]M/i, "") ?? "9:41"}
+      />
       <ChatHeader
-        name="Hooze — Property Consultant"
-        status={typing ? "typing…" : "online"}
+        name={scenario.header}
+        status={typing && next?.from === "me" ? "typing…" : "online"}
         avatar={mark}
       />
       <Wallpaper>
         <div
           ref={scrollRef}
-          className="h-[500px] space-y-1.5 overflow-y-auto px-2.5 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="h-[470px] space-y-1.5 overflow-y-auto px-2.5 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          <DayStamp label="Today" />
-          {SCRIPT.slice(0, n).map((s, i) =>
-            s.text || s.card ? (
-              <div key={i} className="space-y-1.5">
-                {s.text && (
-                  <Bubble from={s.from} time={s.time}>
-                    {s.text}
-                  </Bubble>
-                )}
-                {s.card && <ListingCard p={PROPERTY_BY_ID[s.card]} />}
-              </div>
-            ) : null,
-          )}
-          {typing && SCRIPT[n]?.from === "me" && <TypingBubble />}
-          {done && (
-            <p
-              className="pt-2 text-center text-[10.5px]"
-              style={{ color: WA.sub }}
-            >
-              Inspection booked in 9 minutes. Nobody on the team touched the phone.
-            </p>
-          )}
+          <DayStamp label="Sample conversation" />
+          {scenario.steps.slice(0, n).map((s, i) => (
+            <div key={`${scenario.id}-${i}`} className="space-y-1.5">
+              {s.text && (
+                <Bubble from={s.from} time={s.time}>
+                  {s.text}
+                </Bubble>
+              )}
+              {s.card && PROPERTY_BY_ID[s.card] && (
+                <ListingCard p={PROPERTY_BY_ID[s.card]!} />
+              )}
+              {s.info && <InfoBubble c={s.info} />}
+            </div>
+          ))}
+          {typing && next?.from === "me" && <TypingBubble />}
         </div>
         <div
           className="flex items-center gap-2 px-2 py-2"
@@ -180,5 +190,71 @@ export function ScriptedDemo() {
         <HomeIndicator />
       </Wallpaper>
     </PhoneFrame>
+  );
+}
+
+export function RecordPanel({ p }: { p: Player }) {
+  const { scenario, record, done } = p;
+  const filled = Object.keys(record).length;
+  return (
+    <div className="flex h-full flex-col">
+      <div className="flex items-center justify-between">
+        <p className="eyebrow">{scenario.recordTitle} · building live</p>
+        <span className="font-mono text-xs text-muted">
+          {filled}/{scenario.fields.length}
+        </span>
+      </div>
+      <div className="mt-3 h-px w-full bg-line" aria-hidden>
+        <div
+          className="h-px bg-amber transition-all duration-700"
+          style={{ width: `${(filled / scenario.fields.length) * 100}%` }}
+        />
+      </div>
+      <dl className="mt-2 divide-y divide-line">
+        {scenario.fields.map(([k, label]) => {
+          const v = record[k];
+          return (
+            <div
+              key={k}
+              className="grid grid-cols-[7.5rem_1fr] gap-4 py-3 text-sm"
+            >
+              <dt className="text-muted">{label}</dt>
+              <dd
+                key={v ?? "empty"}
+                className={v ? "hz-flash text-ink" : "text-muted/40"}
+              >
+                {v ?? "—"}
+              </dd>
+            </div>
+          );
+        })}
+      </dl>
+      <div className="mt-auto flex items-center justify-between gap-4 pt-4 text-xs text-muted">
+        <span>
+          {done
+            ? scenario.doneNote
+            : "Filled in automatically as the conversation happens."}
+        </span>
+        {done && (
+          <button
+            onClick={p.replay}
+            className="inline-flex shrink-0 items-center gap-1.5 text-amber hover:text-ink"
+          >
+            <RotateCcw className="h-3.5 w-3.5" /> Replay
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Phone conversation + the record it builds, for one niche. */
+export function ScenarioDemo({ scenarioId }: { scenarioId: string }) {
+  const p = usePlayer(scenarioId);
+  return (
+    <div className="grid items-start gap-8 lg:grid-cols-[auto_1fr] lg:gap-12">
+      <Phone p={p} />
+      <RecordPanel p={p} />
+    </div>
   );
 }

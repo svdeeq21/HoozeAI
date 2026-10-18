@@ -1,3 +1,4 @@
+import { PERSONA_BY_ID } from "./demo-personas";
 const SYSTEM = `You are Hooze, a real-estate and property-investment consultant working for a firm in Abuja, Nigeria. You are chatting with a prospective client on WhatsApp.
 
 You are NOT a chatbot and you never sound like one. You sound like a sharp, warm, experienced Nigerian consultant: short sentences, plain English, no bullet lists unless comparing two properties, no emoji spam (one at most, rarely), no "As an AI".
@@ -88,7 +89,12 @@ const PROVIDERS: Provider[] = [
   },
 ];
 
-async function callProvider(p: Provider, apiKey: string, messages: ChatTurn[]): Promise<string> {
+async function callProvider(
+  p: Provider,
+  apiKey: string,
+  messages: ChatTurn[],
+  system: string,
+): Promise<string> {
   const res = await fetch(p.url, {
     method: "POST",
     headers: {
@@ -97,7 +103,7 @@ async function callProvider(p: Provider, apiKey: string, messages: ChatTurn[]): 
     },
     body: JSON.stringify({
       model: p.model,
-      messages: [{ role: "system", content: SYSTEM }, ...messages.slice(-20)],
+      messages: [{ role: "system", content: system }, ...messages.slice(-20)],
       temperature: 0.7,
       max_tokens: 500,
     }),
@@ -117,7 +123,15 @@ async function callProvider(p: Provider, apiKey: string, messages: ChatTurn[]): 
   return text;
 }
 
-export async function askHooze(messages: ChatTurn[]): Promise<string> {
+export async function askHooze(
+  messages: ChatTurn[],
+  personaId?: string,
+): Promise<string> {
+  const persona =
+    personaId && personaId !== "realestate"
+      ? PERSONA_BY_ID[personaId]
+      : undefined;
+  const system = persona ? persona.context : SYSTEM;
   const attempted: string[] = [];
   let lastErr = new Error("failed");
 
@@ -126,10 +140,13 @@ export async function askHooze(messages: ChatTurn[]): Promise<string> {
     if (!apiKey) continue;
     attempted.push(p.name);
     try {
-      return await callProvider(p, apiKey, messages);
+      return await callProvider(p, apiKey, messages, system);
     } catch (err) {
       lastErr = err instanceof Error ? err : new Error("failed");
-      console.error(`Hooze demo: ${p.name} failed, trying next provider`, lastErr.message);
+      console.error(
+        `Hooze demo: ${p.name} failed, trying next provider`,
+        lastErr.message,
+      );
     }
   }
 

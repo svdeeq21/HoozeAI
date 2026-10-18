@@ -1,5 +1,13 @@
 import { type ReactNode, forwardRef } from "react";
-import { Check, Phone, Video, ArrowLeft, MoreVertical, Search, Camera } from "lucide-react";
+import {
+  Check,
+  Phone,
+  Video,
+  ArrowLeft,
+  MoreVertical,
+  Search,
+  Camera,
+} from "lucide-react";
 import type { DemoProperty } from "../lib/demo-properties";
 
 /* Device + WhatsApp replica colours. These are hardware/app colours of a real
@@ -116,7 +124,10 @@ export function StatusBar({ time = "4:41" }: { time?: string }) {
           <rect x="12" y="0" width="2.5" height="11" rx="0.6" opacity="0.4" />
         </svg>
         <svg width="14" height="11" viewBox="0 0 14 11" fill="currentColor">
-          <path d="M7 10.5 0.4 3.6A9.3 9.3 0 0 1 13.6 3.6L7 10.5Z" opacity="0.9" />
+          <path
+            d="M7 10.5 0.4 3.6A9.3 9.3 0 0 1 13.6 3.6L7 10.5Z"
+            opacity="0.9"
+          />
         </svg>
         <svg width="22" height="11" viewBox="0 0 24 12" fill="none">
           <rect
@@ -128,7 +139,14 @@ export function StatusBar({ time = "4:41" }: { time?: string }) {
             stroke="currentColor"
             opacity="0.5"
           />
-          <rect x="2" y="2" width="15" height="8" rx="1.8" fill="currentColor" />
+          <rect
+            x="2"
+            y="2"
+            width="15"
+            height="8"
+            rx="1.8"
+            fill="currentColor"
+          />
           <path d="M22 4v4a2 2 0 0 0 0-4Z" fill="currentColor" opacity="0.5" />
         </svg>
       </span>
@@ -301,7 +319,10 @@ export function ListingCard({ p }: { p: DemoProperty }) {
           <p className="text-[11px] leading-snug" style={{ color: WA.sub }}>
             {p.terms}
           </p>
-          <p className="mt-1.5 text-[10px] uppercase tracking-wider" style={{ color: WA.sub }}>
+          <p
+            className="mt-1.5 text-[10px] uppercase tracking-wider"
+            style={{ color: WA.sub }}
+          >
             Demo listing
           </p>
         </div>
@@ -325,7 +346,10 @@ export function DayStamp({ label }: { label: string }) {
 
 export function HomeIndicator() {
   return (
-    <div className="flex justify-center pb-[7px] pt-[6px]" style={{ background: WA.header }}>
+    <div
+      className="flex justify-center pb-[7px] pt-[6px]"
+      style={{ background: WA.header }}
+    >
       <span className="h-[4px] w-[110px] rounded-full bg-white/30" />
     </div>
   );
@@ -347,11 +371,18 @@ export function ChatListHeader({ unread }: { unread: number }) {
         </div>
       </div>
       <div className="mt-2.5 flex items-center gap-4 text-[12.5px]">
-        <span className="pb-1.5 font-medium" style={{ borderBottom: "2px solid #00A884", color: "#00A884" }}>
+        <span
+          className="pb-1.5 font-medium"
+          style={{ borderBottom: "2px solid #00A884", color: "#00A884" }}
+        >
           Chats {unread > 0 && <span>({unread})</span>}
         </span>
-        <span className="pb-1.5" style={{ color: WA.sub }}>Status</span>
-        <span className="pb-1.5" style={{ color: WA.sub }}>Calls</span>
+        <span className="pb-1.5" style={{ color: WA.sub }}>
+          Status
+        </span>
+        <span className="pb-1.5" style={{ color: WA.sub }}>
+          Calls
+        </span>
       </div>
     </div>
   );
@@ -386,9 +417,15 @@ export function ChatRow({
       >
         {initials}
       </span>
-      <div className="min-w-0 flex-1 border-b pb-2.5" style={{ borderColor: "rgba(255,255,255,.06)" }}>
+      <div
+        className="min-w-0 flex-1 border-b pb-2.5"
+        style={{ borderColor: "rgba(255,255,255,.06)" }}
+      >
         <div className="flex items-baseline justify-between gap-2">
-          <p className="truncate text-[14.5px] font-medium" style={{ color: WA.text }}>
+          <p
+            className="truncate text-[14.5px] font-medium"
+            style={{ color: WA.text }}
+          >
             {name}
           </p>
           <span

@@ -51,7 +51,7 @@ export function reportLovableError(error: unknown, context: Record<string, unkno
         : String(error);
   window.__lovableReportRuntimeError?.({
     message,
-    stack: error instanceof Error ? error.stack : undefined,
+    ...(error instanceof Error && error.stack ? { stack: error.stack } : {}),
     filename: window.location.pathname,
   });
 }

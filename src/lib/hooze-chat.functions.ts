@@ -3,6 +3,9 @@ import { z } from "zod";
 import { askHooze } from "./hooze-chat.server";
 
 const schema = z.object({
+  persona: z
+    .enum(["realestate", "restaurant", "school", "homeservices"])
+    .optional(),
   messages: z
     .array(
       z.object({
@@ -18,7 +21,7 @@ export const hoozeDemoReply = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => schema.parse(data))
   .handler(async ({ data }) => {
     try {
-      return { text: await askHooze(data.messages) };
+      return { text: await askHooze(data.messages, data.persona) };
     } catch (err) {
       const msg = err instanceof Error ? err.message : "failed";
       return {

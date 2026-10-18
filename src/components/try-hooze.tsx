@@ -14,12 +14,15 @@ import {
 } from "./phone";
 import { PROPERTY_BY_ID } from "../lib/demo-properties";
 import { hoozeDemoReply } from "../lib/hooze-chat.functions";
+import { PERSONA_BY_ID } from "../lib/demo-personas";
 import mark from "../assets/hooze-icon.png";
 
-type Line = { from: "them" | "me"; text: string; time: string; cards: string[] };
-
-const OPENER =
-  "Hi, welcome. I'm Hooze, the property consultant for this listing page.\n\nI can help you narrow down by budget, area, property type and what you actually need the place for. What brings you here today?";
+type Line = {
+  from: "them" | "me";
+  text: string;
+  time: string;
+  cards: string[];
+};
 
 function now() {
   return new Date().toLocaleTimeString("en-NG", {
@@ -39,10 +42,15 @@ function parse(raw: string) {
   return { text, cards };
 }
 
-export function TryHooze() {
+export function TryHooze({
+  personaId = "realestate",
+}: {
+  personaId?: "realestate" | "restaurant" | "school" | "homeservices";
+}) {
+  const persona = PERSONA_BY_ID[personaId]!;
   const send = useServerFn(hoozeDemoReply);
   const [lines, setLines] = useState<Line[]>([
-    { from: "me", text: OPENER, time: "", cards: [] },
+    { from: "me", text: persona.opener, time: "", cards: [] },
   ]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -51,9 +59,10 @@ export function TryHooze() {
 
   useEffect(() => {
     setClock(now().replace(/\s?[AP]M/i, ""));
-    setLines((prev) => prev.map((l, i) => (i === 0 ? { ...l, time: now() } : l)));
+    setLines((prev) =>
+      prev.map((l, i) => (i === 0 ? { ...l, time: now() } : l)),
+    );
   }, []);
-
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -64,7 +73,10 @@ export function TryHooze() {
     e.preventDefault();
     const value = input.trim();
     if (!value || busy) return;
-    const next: Line[] = [...lines, { from: "them", text: value, time: now(), cards: [] }];
+    const next: Line[] = [
+      ...lines,
+      { from: "them", text: value, time: now(), cards: [] },
+    ];
     setLines(next);
     setInput("");
     setBusy(true);
@@ -73,8 +85,16 @@ export function TryHooze() {
         role: l.from === "me" ? ("assistant" as const) : ("user" as const),
         content: l.text,
       }));
-      const res = await send({ data: { messages: history } });
-      const { text, cards } = parse(res.text);
+      const res = await send({
+        data: { messages: history, persona: personaId },
+      });
+      const { text, cards } =
+        personaId === "realestate"
+          ? parse(res.text)
+          : {
+              text: res.text.replace(/\[\[PROPERTY:[a-z-]+\]\]/gi, "").trim(),
+              cards: [] as string[],
+            };
       setLines((prev) => [...prev, { from: "me", text, time: now(), cards }]);
     } catch {
       setLines((prev) => [
@@ -95,7 +115,7 @@ export function TryHooze() {
     <PhoneFrame>
       <StatusBar time={clock} />
       <ChatHeader
-        name="Hooze — Property Consultant"
+        name={persona.header}
         status={busy ? "typing…" : "online"}
         avatar={mark}
       />
@@ -112,9 +132,11 @@ export function TryHooze() {
                   {l.text}
                 </Bubble>
               )}
-              {l.cards.map((id) => (
-                <ListingCard key={id} p={PROPERTY_BY_ID[id]} />
-              ))}
+              {l.cards.map((id) =>
+                PROPERTY_BY_ID[id] ? (
+                  <ListingCard key={id} p={PROPERTY_BY_ID[id]!} />
+                ) : null,
+              )}
             </div>
           ))}
           {busy && <TypingBubble />}
