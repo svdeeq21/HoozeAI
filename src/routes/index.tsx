@@ -1300,7 +1300,7 @@ function Brief() {
               >
                 <MessageSquare className="h-4 w-4" /> Send my brief on WhatsApp
               </a>
-              <a href="mailto:hoozeenterprises@gmail.com" className="btn-ghost">
+              <a href="mailto:ai@hoozeenterprises.co.uk" className="btn-ghost">
                 Email us instead
               </a>
             </div>
